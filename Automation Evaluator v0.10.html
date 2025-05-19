@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automation Case Evaluator</title>
+  <!-- Bootstrap & FontAwesome -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { position: relative; background:#fff; color:#000; }
+    .nav-tabs .nav-link.active{ background:#ff0000; color:#fff; }
+    .nav-tabs .nav-link{ color:#000; }
+    .info-icon{ margin-left:5px; color:#ff0000; cursor:pointer; }
+    .puma-logo{ width:50px; height:auto; position:absolute; top:-30px; right:20px; }
+  </style>
+</head>
+<body>
+  <!-- Logo -->
+  <img src="data:image/png;base64,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59z1kXeJ45j1xNtI3EqF/GO/4oortMeCeMv999/vHk3vmFNhJlEfqYjTLaVRXaY7wzfffOP8AiFff84556jFixe7f/IrWVJbnkYqGTVqVJZVM+UXD1l34r777lOdOnVy7hiTha7EG2+8oQoVKuRsWy7p+SnK0EscS/3JDzpxKxVi8uTJ2mNBco9cK12xYoV7JL2jVJgJEzXtJI4jFULu/si4DFK1alW1cOFC90+SJ4WirPvEZVnfIpn3E2SVOJ76kx904lgqZCnae+65R3s8SM4ZOnSoexT94fKHmfj9rY7LH2YS11IhZH5ExmTKM88805lPlcy25JbT/v37O585si15mOLMmTO57GFI4pjqT37QiWOpELt27eL2Up+Ra6LJYqKmmUT98gelwk7yUirEiBEjMlfMlGMh61F4XVNCvq/MZZMHlWXMoahcubKaPXs2hcKgxHHVn/ygE9dSIdLT01WXLl20x4X8NyVKlMjz0wMpFWYS9csflAo7yWupEHL7Z8YzOiQy0nDjjTc6Ixny+PINGzY461RI1q5dq+bMmeOMTMjoWsYlFEnz5s2dJzLDrMSxPf6k24y0yDiTpWEbN2583Exl8usbqYzmfPzxx+6RSp6sa6H7HjYizzTw491339Vux0YaNGjg6/KHfBCE5edanu+wfv16d89y95///Oe4DyPbkf3xSkpFxvMswpCcVsb0Q277HDRokLrggguyfA/5b/K00dq1azsTO0/8c5kgP2HCBGfBK5h3krS1MEQeb8vSqMr57U/KVY8ePZx17OW46I5XqqdVq1aqXbt2zvr///73v42tcCdvarrvZyN+H9u+aNEi7XZsRH4+vT6oScjEOjmnum0FHXlQlfwW65VM6rz99tu12wo6LVu29DXJVNZkuOOOO7TbspF//etf7p6ZIedRRiikKMgaE7rRMBnhlKIhP3/yi5ufETb4d5L7vwAARJbcaiuLZckzQ2RUTzJ9+nRneW4/RQx5Q6kAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAEZQKAABgBKUCAAAYQakAAABGUCoAAIARlAoAAGAEpQIAABhBqQAAAEZQKgAAgBGUCgAAYASlAgAAGEGpAAAARlAqAACAAUr9P882g3x9SL7WAAAAAElFTkSuQmCC" alt="PUMA Logo" class="puma-logo">
+
+  <div class="container mt-5 position-relative">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="tabMenu" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="inputs-tab" data-bs-toggle="tab" data-bs-target="#inputs" type="button">Inputs</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button">Data</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="business-tab" data-bs-toggle="tab" data-bs-target="#business" type="button">Business Case</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- Inputs TAB -->
+      <div class="tab-pane fade show active p-3" id="inputs">
+        <form>
+          <div class="mb-3">
+            <label class="form-label" for="process-name">Process Name <i class="fas fa-info-circle info-icon" title="Name your process idea. It should be simple and should tell what the process context"></i></label>
+            <input type="text" id="process-name" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="description">Description <i class="fas fa-info-circle info-icon" title="What’s the challenge / the problem you want to solve? How do you solve it today?"></i></label>
+            <textarea id="description" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="business-value">Business Value <i class="fas fa-info-circle info-icon" title="Select the business value this process contributes to"></i></label>
+            <select id="business-value" class="form-select">
+              <option>Increases efficiency / reduces costs</option>
+              <option>Increases accuracy / reduces errors</option>
+              <option>Avoid risk/potential loss</option>
+              <option>Execute unperformed processes</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="frequency-select">Frequency <i class="fas fa-info-circle info-icon" title="The frequency you or your department is performing the process"></i></label>
+            <select id="frequency-select" class="form-select">
+              <option>Daily</option>
+              <option>Weekly</option>
+              <option>Monthly</option>
+              <option>Quarterly</option>
+              <option>Yearly</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="avg-processing-time">Average processing time per frequency (Min) <i class="fas fa-info-circle info-icon" title="Enter the average duration of a single transaction for this process, in minutes"></i></label>
+            <input type="number" id="avg-processing-time" class="form-control" value="60" inputmode="numeric" onwheel="this.blur()">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="applications">Applications in use <i class="fas fa-info-circle info-icon" title="e.g. SAP, Outlook, Excel, PDF..."></i></label>
+            <input type="text" id="applications" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="data-structure">Data Structure <i class="fas fa-info-circle info-icon" title="Select the data structure type"></i></label>
+            <select id="data-structure" class="form-select">
+              <option>Mainly structured</option>
+              <option>Partly structured</option>
+              <option>Mainly unstructured</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="tech-stability">Technical Stability <i class="fas fa-info-circle info-icon" title="Select the technical maturity of the system"></i></label>
+            <select id="tech-stability" class="form-select">
+              <option>Stable and mature</option>
+              <option>New system</option>
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <!-- Data TAB -->
+      <div class="tab-pane fade p-3" id="data">
+        <form>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="daily-hours">Daily Working hours</label><div class="col-sm-6"><input type="number" id="daily-hours" class="form-control" value="8"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="orch-cost">UIPath Orchestrator cost (EUR)</label><div class="col-sm-6"><input type="number" id="orch-cost" class="form-control" value="15000"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="robot-cost">UIPath Robot license cost (EUR)</label><div class="col-sm-6"><input type="number" id="robot-cost" class="form-control" value="5000"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="studio-cost">UIPath Studio license cost (EUR)</label><div class="col-sm-6"><input type="number" id="studio-cost" class="form-control" value="3000"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="num-robots">How many UIPath robots are connected to UIPath Orchestrator?</label><div class="col-sm-6"><input type="number" id="num-robots" class="form-control" value="15"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="num-studio">How many UIPath Studio licenses are used?</label><div class="col-sm-6"><input type="number" id="num-studio" class="form-control" value="15"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="impl-rate">Daily rate of Implementation (EUR)</label><div class="col-sm-6"><input type="number" id="impl-rate" class="form-control" value="200"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="biz-rate">Daily rate of business team (EUR)</label><div class="col-sm-6"><input type="number" id="biz-rate" class="form-control" value="200"></div></div>
+          <div class="row mb-3"><label class="col-sm-6 col-form-label" for="impl-time">Implementation time (Day)</label><div class="col-sm-6"><input type="number" id="impl-time" class="form-control" value="20"></div></div>
+        </form>
+      </div>
+
+      <!-- Business Case TAB -->
+      <div class="tab-pane fade p-3" id="business">
+        <h5 class="mb-4">Business Case Summary</h5>
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          <div class="col">
+            <div class="card shadow-sm h-100 border-dark">
+              <div class="card-header bg-dark text-white py-1">Process Name</div>
+              <div class="card-body"><span id="summary-process-name" class="fs-5">-</span></div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card shadow-sm h-100 border-success">
+              <div class="card-header bg-success text-white py-1">Yearly Manual Hour Saving
+                <i class="fas fa-info-circle info-icon"
+                   title="The total hours saved if 100 % of the idea is automated."></i>
+                    <style>
+                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
+                      .card-header .info-icon { color: #ffffff !important; }
+                    </style>
+              </div>
+              <div class="card-body">
+                <span id="summary-hour-saving" class="fs-5">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card shadow-sm h-100 border-success">
+              <div class="card-header bg-success text-white py-1">Yearly Benefit
+                <i class="fas fa-info-circle info-icon"
+                   title="The total yearly benefit if 100 % of the idea is automated. Dependencies are, frequency, Average processing time, and the daily rate. Other quantifiable benefits such as prevented loss or earned cash can be included."></i>
+                    <style>
+                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
+                      .card-header .info-icon { color: #ffffff !important; }
+                    </style>
+              </div>
+              <div class="card-body">
+                <span id="summary-benefit" class="fs-5">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card shadow-sm h-100 border-danger">
+              <div class="card-header bg-danger text-white py-1">UiPath License Cost</div>
+              <div class="card-body"><span id="summary-uipath-license-cost" class="fs-5">-</span></div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card shadow-sm h-100 border-danger">
+              <div class="card-header bg-danger text-white py-1">Implementation Cost
+                <i class="fas fa-info-circle info-icon"
+                   title="Implementation rate multiplied by implementation time."></i>
+                    <style>
+                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
+                      .card-header .info-icon { color: #ffffff !important; }
+                    </style>
+              </div>
+              <div class="card-body">
+                <span id="summary-implementation-cost" class="fs-5">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card shadow-sm h-100 border-danger">
+              <div class="card-header bg-danger text-white py-1">Operations Cost<i class="fas fa-info-circle info-icon"
+                   title="30 process per an operations developer, who works %20 in operations is assumed."></i>
+                    <style>
+                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
+                      .card-header .info-icon { color: #ffffff !important; }
+                    </style>
+              </div>
+              <div class="card-body">
+                <span id="summary-operations-cost" class="fs-5">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr class="my-4">
+        <div class="card shadow-sm p-3 mb-3">
+        <canvas id="roiChart" height="200"></canvas>
+        </div>
+        <button id="btn-save" class="btn btn-outline-primary">
+          Save Business Case as CSV<i class="fas fa-download"></i>
+        </button>
+      </div>
+
+      <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let roiChart=null;
+
+    function calcValues(){
+      // Inputs
+      const processName=document.getElementById('process-name').value;
+      const avgMin=parseFloat(document.getElementById('avg-processing-time').value||0);
+      const freq=document.getElementById('frequency-select').value;
+      const timesPerYear={Daily:220,Weekly:52,Monthly:12,Quarterly:4,Yearly:1}[freq]||0;
+      const yearlyHours=(avgMin/60)*timesPerYear;
+  
+      // Data values
+      const dailyHours=parseFloat(document.getElementById('daily-hours').value||0);
+      const bizRateDaily=parseFloat(document.getElementById('biz-rate').value||0);
+      const benefit=yearlyHours*(bizRateDaily/dailyHours);
+
+      const implTime=parseFloat(document.getElementById('impl-time').value||0);
+      const implRate=parseFloat(document.getElementById('impl-rate').value||0);
+      const implementationCost=implTime*implRate;
+      const operationsCost = implRate * 220 * 0.2 / 30;
+      
+      const orchCost=parseFloat(document.getElementById('orch-cost').value||0);
+      const studioCostUnit=parseFloat(document.getElementById('studio-cost').value||0);
+      const studioLicenses=parseFloat(document.getElementById('num-studio').value||0);
+      const robotCostUnit=parseFloat(document.getElementById('robot-cost').value||0);
+      const numRobots=parseFloat(document.getElementById('num-robots').value||1);
+      const licenseComponent=((orchCost+studioCostUnit*studioLicenses)/numRobots)+robotCostUnit;
+      const licenseCost=licenseComponent*(yearlyHours/19440);
+
+      return {processName,yearlyHours,benefit,implementationCost,licenseCost,operationsCost};
+    }
+
+    function updateUI(){
+      const v=calcValues();
+      document.getElementById('summary-process-name').textContent=v.processName||'-';
+      document.getElementById('summary-hour-saving').textContent=Math.round(v.yearlyHours)+' hours';
+      document.getElementById('summary-benefit').textContent=Math.round(v.benefit)+' EUR';
+      document.getElementById('summary-implementation-cost').textContent=Math.round(v.implementationCost)+' EUR';
+      document.getElementById('summary-uipath-license-cost').textContent=Math.round(v.licenseCost)+' EUR';
+      document.getElementById('summary-operations-cost').textContent = Math.round(v.operationsCost) + ' EUR';
+
+                  // chart data (net cumulative benefit)
+      const months = [...Array(13).keys()].map(i => `M${i}`); // M0..M12
+      const monthlyBenefit = v.benefit / 12;
+      const monthlyLicense = v.licenseCost / 12;
+      const monthlyOps = v.operationsCost / 12;
+      const monthlyNet = monthlyBenefit - monthlyLicense - monthlyOps;       // net gain per month
+      const cumNet = months.map((_, i) => Math.round(-v.implementationCost + monthlyNet * i));
+
+      // first month (after M0) where cumulative net crosses >= 0
+      const highlightIdx = cumNet.findIndex((val, idx) => idx > 0 && val >= 0);
+      const pointColors = cumNet.map((_, i) => i === highlightIdx ? '#ff0000' : '#00aa00');
+      const pointSizes  = cumNet.map((_, i) => i === highlightIdx ? 6 : 3);
+
+      if (!roiChart) {
+        const ctx = document.getElementById('roiChart').getContext('2d');
+        roiChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: months,
+            datasets: [{
+              label: 'Net Cumulative Benefit',
+              data: cumNet,
+              borderColor: '#00aa00',
+              backgroundColor: pointColors,
+              pointRadius: pointSizes,
+              pointHoverRadius: pointSizes,
+              tension: 0.3,
+              fill: false
+            }]
+          },
+          options: {
+  responsive: true,
+  maintainAspectRatio: false,
+
+  plugins: {
+    legend: { display: false }        // başlık çubuğunu sakla
+  },
+
+  scales: {
+    x: {
+      grid: { display: false },       // dikey ızgara yok
+      ticks:{ color:'#666' }
+    },
+    y: {
+      grid: {                         // yatay çizgileri çok açık ton
+        drawBorder:false,
+        color:'rgba(0,0,0,0.05)'
+      },
+      ticks:{ precision:0, color:'#666' }
+    }
+  }
+}
+
+        });
+      } else {
+        roiChart.data.labels = months;
+        roiChart.data.datasets[0].data = cumNet;
+        roiChart.data.datasets[0].backgroundColor = pointColors;
+        roiChart.data.datasets[0].pointRadius = pointSizes;
+        roiChart.data.datasets[0].pointHoverRadius = pointSizes;
+        roiChart.update();
+      }
+      }
+
+    function collectCSVData () {
+    // tüm Inputs + Data <input>/<select>/<textarea> elemanları
+    const fields = document.querySelectorAll(
+      '#inputs input, #inputs select, #inputs textarea,' +
+      '#data   input, #data   select');
+    const result = {};
+
+    fields.forEach(el => {
+      const key = el.id || el.name || 'unnamed';
+      result[key] = el.value;
+    });
+
+    // Business-Case metriklerini önce güncelle, sonra al
+    updateUI();
+    result.summary_hour_saving         = document.getElementById('summary-hour-saving').textContent;
+    result.summary_benefit             = document.getElementById('summary-benefit').textContent;
+    result.summary_implementation_cost = document.getElementById('summary-implementation-cost').textContent;
+    result.summary_license_cost        = document.getElementById('summary-uipath-license-cost').textContent;
+    result.summary_operations_cost     = document.getElementById('summary-operations-cost').textContent;
+
+    return result;
+  }
+
+  // tek satırlık CSV oluştur ve indir
+  function downloadCSV (obj) {
+    const header = Object.keys(obj).join(',') + '\n';
+    const body   = Object.values(obj).join(',') + '\n';
+    const blob   = new Blob([header + body], { type: 'text/csv' });
+    const url    = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'automation_case_' + Date.now() + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // ------------------ OLAY BAĞLANTILARI ------------------
+  document.getElementById('business-tab')
+          .addEventListener('click', updateUI);
+
+  // “Save CSV” düğmesi
+  document.getElementById('btn-save')
+          .addEventListener('click', () => {
+             const data = collectCSVData();
+             downloadCSV(data);
+          });
+
+    
+    
+
+    // update when Business Case tab shown
+    document.getElementById('business-tab').addEventListener('click',updateUI);
+  </script>
+</body>
+</html>
