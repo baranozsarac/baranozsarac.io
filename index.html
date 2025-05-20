@@ -149,7 +149,7 @@
           </div>
           <div class="col">
             <div class="card shadow-sm h-100 border-danger">
-              <div class="card-header bg-danger text-white py-1">UiPath License Cost</div>
+              <div class="card-header bg-danger text-white py-1">Yearly UiPath License Cost</div>
               <div class="card-body"><span id="summary-uipath-license-cost" class="fs-5">-</span></div>
             </div>
           </div>
@@ -170,7 +170,7 @@
           </div>
           <div class="col">
             <div class="card shadow-sm h-100 border-danger">
-              <div class="card-header bg-danger text-white py-1">Operations Cost<i class="fas fa-info-circle info-icon"
+              <div class="card-header bg-danger text-white py-1">Yearly Operations Cost<i class="fas fa-info-circle info-icon"
                    title="30 process per an operations developer, who works %20 in operations is assumed."></i>
                     <style>
                       /* Sadece kart başlığındaki info ikonları beyaz olsun */
@@ -270,20 +270,32 @@
   maintainAspectRatio: false,
 
   plugins: {
+    title: {
+        display: true,
+        text: 'Breakeven Point Analysis'        // Grafiğin tepesindeki başlık
+      },
     legend: { display: false }        // başlık çubuğunu sakla
   },
 
   scales: {
     x: {
       grid: { display: false },       // dikey ızgara yok
-      ticks:{ color:'#666' }
+      ticks:{ color:'#666' },
+      title: {
+          display: true,
+          text: 'Time'              // X ekseni etiketi
+        },
     },
     y: {
       grid: {                         // yatay çizgileri çok açık ton
         drawBorder:false,
         color:'rgba(0,0,0,0.05)'
       },
-      ticks:{ precision:0, color:'#666' }
+      ticks:{ precision:0, color:'#666' },
+      title: {
+          display: true,
+          text: 'Benefit'           // Y ekseni etiketi
+        },
     }
   }
 }
