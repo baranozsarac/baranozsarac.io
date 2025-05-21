@@ -213,7 +213,7 @@
       const implTime=parseFloat(document.getElementById('impl-time').value||0);
       const implRate=parseFloat(document.getElementById('impl-rate').value||0);
       const implementationCost=implTime*implRate;
-      const operationsCost = implRate * 220 * 0.2 / 30;
+      const operationsCost = implRate * 260 * 0.2 / 30;
       
       const orchCost=parseFloat(document.getElementById('orch-cost').value||0);
       const studioCostUnit=parseFloat(document.getElementById('studio-cost').value||0);
@@ -221,8 +221,8 @@
       const robotCostUnit=parseFloat(document.getElementById('robot-cost').value||0);
       const numRobots=parseFloat(document.getElementById('num-robots').value||1);
       const licenseComponent=((orchCost+studioCostUnit*studioLicenses)/numRobots)+robotCostUnit;
-      const licenseCost=licenseComponent*(yearlyHours/19440);
-
+      const licenseCost=licenseComponent*(yearlyHours/19440); // 24 (hours in a day) * 30 (day in month) * 12 (months in year) * 0.75 (robot utilization) * 3 (robot is faster than human) 
+		
       return {processName,yearlyHours,benefit,implementationCost,licenseCost,operationsCost};
     }
 
