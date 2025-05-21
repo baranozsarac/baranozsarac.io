@@ -72,7 +72,14 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="applications">Applications in use <i class="fas fa-info-circle info-icon" title="e.g. SAP, Outlook, Excel, PDF..."></i></label>
-            <input type="text" id="applications" class="form-control">
+            <input type="text" id="applications" class="form-control" list="app-list" >
+			 <datalist id="app-list">
+				<option value="SAP">
+				<option value="Outlook">
+				<option value="Excel">
+				<option value="PDF">
+				<option value="Word">
+  </datalist>
           </div>
           <div class="mb-3">
             <label class="form-label" for="data-structure">Data Structure <i class="fas fa-info-circle info-icon" title="Select the data structure type"></i></label>
