@@ -368,11 +368,37 @@
              downloadCSV(data);
           });
 
-    
-    
-
     // update when Business Case tab shown
     document.getElementById('business-tab').addEventListener('click',updateUI);
+
+    // Sayfa tamamen yüklendiğinde çalışacak
+    document.addEventListener('DOMContentLoaded', () => {
+      const dl    = document.getElementById('app-list');
+      const input = document.getElementById('applications');
+
+      // 2.a) Önceden saklanan önerileri yükle
+      JSON.parse(localStorage.getItem('appSuggestions')||'[]')
+        .forEach(val => {
+          const opt = document.createElement('option');
+          opt.value = val;
+          dl.appendChild(opt);
+        });
+
+      // 2.b) Her değişiklikte yeni girdiyi kaydet
+      input.addEventListener('change', () => {
+        const v = input.value.trim();
+        if (!v) return;
+        if (![...dl.options].some(o => o.value === v)) {
+          const opt = document.createElement('option');
+          opt.value = v;
+          dl.appendChild(opt);
+          const arr = JSON.parse(localStorage.getItem('appSuggestions')||'[]');
+          arr.push(v);
+          localStorage.setItem('appSuggestions', JSON.stringify(arr));
+        }
+      });
+    });
+    
   </script>
 </body>
 </html>
