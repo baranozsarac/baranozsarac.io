@@ -9,35 +9,66 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    body { position: relative; background:#fff; color:#000; }
-    .nav-tabs .nav-link.active{ background:#ff0000; color:#fff; }
-    .nav-tabs .nav-link{ color:#000; }
-    .info-icon{ margin-left:5px; color:#ff0000; cursor:pointer; }
-    .puma-logo{ width:50px; height:auto; position:absolute; top:-30px; right:20px; }
+    /* ---------- Page & Background ---------- */
+    body {
+      min-height: 100vh;
+      background: url('https://about.puma.com/sites/default/files/styles/dd_hero_tablet/public/media/hero/images/our-sport.png?itok=LN5lbSxg') center / cover fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      color: #000;
+    }
+
+    /* ---------- Frosted‑Glass Card ---------- */
+    .dashboard-wrapper {
+      backdrop-filter: blur(6px);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 1rem;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    /* ---------- UI Tweaks ---------- */
+    .nav-tabs .nav-link.active { background: #ff0000; color: #fff; }
+    .nav-tabs .nav-link { color: #000; }
+    .info-icon { margin-left: 5px; color: #ff0000; cursor: pointer; }
+    /* Sadece Business Case sekmesindeki kart başlıklarında beyaz ikon */
+    #business .card-header .info-icon {color: #ffffff !important;}
+
+
+    /* ---------- Example Graphic Areas (optional) ---------- */
+    /* .chart-container { width: 280px; height: 280px; margin: 0 auto; position: relative; } */
+    .bar-container   { width: 100%;  height: 540px; margin: 0 auto; position: relative; }
+    @media (max-width: 992px) {
+      .chart-container { width: 220px; height: 220px; }
+      .bar-container   { height: 420px; }
+    }
   </style>
 </head>
 <body>
-  <!-- Logo -->
-  <img src="data:image/png;base64,..." alt="PUMA Logo" class="puma-logo">
+  
 
-  <div class="container mt-5 position-relative">
+  <div class="container mt-5 position-relative dashboard-wrapper">
     <!-- Tabs -->
     <ul class="nav nav-tabs" id="tabMenu" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="inputs-tab" data-bs-toggle="tab" data-bs-target="#inputs" type="button">Inputs</button>
+        <button class="nav-link active" id="inputs-tab" data-bs-toggle="tab" data-bs-target="#inputs" type="button" role="tab">Inputs</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button">Data</button>
+        <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab">Data</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="business-tab" data-bs-toggle="tab" data-bs-target="#business" type="button">Business Case</button>
+        <button class="nav-link" id="business-tab" data-bs-toggle="tab" data-bs-target="#business" type="button" role="tab">Business Case</button>
       </li>
     </ul>
 
     <div class="tab-content">
       <!-- Inputs TAB -->
-      <div class="tab-pane fade show active p-3" id="inputs">
+      <div class="tab-pane fade show active p-3" id="inputs" role="tabpanel" aria-labelledby="inputs-tab">
         <form>
           <div class="mb-3">
             <label class="form-label" for="process-name">Process Name <i class="fas fa-info-circle info-icon" title="Name your process idea. It should be simple and should tell what the process context"></i></label>
@@ -73,13 +104,13 @@
           <div class="mb-3">
             <label class="form-label" for="applications">Applications in use <i class="fas fa-info-circle info-icon" title="e.g. SAP, Outlook, Excel, PDF..."></i></label>
             <input type="text" id="applications" class="form-control" list="app-list" >
-			 <datalist id="app-list">
-				<option value="SAP">
-				<option value="Outlook">
-				<option value="Excel">
-				<option value="PDF">
-				<option value="Word">
-  </datalist>
+            <datalist id="app-list">
+              <option value="SAP">
+              <option value="Outlook">
+              <option value="Excel">
+              <option value="PDF">
+              <option value="Word">
+            </datalist>
           </div>
           <div class="mb-3">
             <label class="form-label" for="data-structure">Data Structure <i class="fas fa-info-circle info-icon" title="Select the data structure type"></i></label>
@@ -100,7 +131,7 @@
       </div>
 
       <!-- Data TAB -->
-      <div class="tab-pane fade p-3" id="data">
+      <div class="tab-pane fade p-3" id="data" role="tabpanel" aria-labelledby="data-tab">
         <form>
           <div class="row mb-3"><label class="col-sm-6 col-form-label" for="daily-hours">Daily Working hours</label><div class="col-sm-6"><input type="number" id="daily-hours" class="form-control" value="8"></div></div>
           <div class="row mb-3"><label class="col-sm-6 col-form-label" for="orch-cost">UIPath Orchestrator cost (EUR)</label><div class="col-sm-6"><input type="number" id="orch-cost" class="form-control" value="15000"></div></div>
@@ -115,7 +146,7 @@
       </div>
 
       <!-- Business Case TAB -->
-      <div class="tab-pane fade p-3" id="business">
+      <div class="tab-pane fade p-3" id="business" role="tabpanel" aria-labelledby="business-tab">
         <h5 class="mb-4">Business Case Summary</h5>
         <div class="row row-cols-1 row-cols-md-2 g-3">
           <div class="col">
@@ -127,12 +158,7 @@
           <div class="col">
             <div class="card shadow-sm h-100 border-success">
               <div class="card-header bg-success text-white py-1">Yearly Manual Hour Saving
-                <i class="fas fa-info-circle info-icon"
-                   title="The total hours saved if 100 % of the idea is automated."></i>
-                    <style>
-                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
-                      .card-header .info-icon { color: #ffffff !important; }
-                    </style>
+                <i class="fas fa-info-circle info-icon" title="The total hours saved if 100 % of the idea is automated."></i>
               </div>
               <div class="card-body">
                 <span id="summary-hour-saving" class="fs-5">-</span>
@@ -142,12 +168,7 @@
           <div class="col">
             <div class="card shadow-sm h-100 border-success">
               <div class="card-header bg-success text-white py-1">Yearly Benefit
-                <i class="fas fa-info-circle info-icon"
-                   title="The total yearly benefit if 100 % of the idea is automated. Dependencies are, frequency, Average processing time, and the daily rate. Other quantifiable benefits such as prevented loss or earned cash can be included."></i>
-                    <style>
-                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
-                      .card-header .info-icon { color: #ffffff !important; }
-                    </style>
+                <i class="fas fa-info-circle info-icon" title="The total yearly benefit if 100 % of the idea is automated. Dependencies are, frequency, Average processing time, and the daily rate. Other quantifiable benefits such as prevented loss or earned cash can be included."></i>
               </div>
               <div class="card-body">
                 <span id="summary-benefit" class="fs-5">-</span>
@@ -163,12 +184,7 @@
           <div class="col">
             <div class="card shadow-sm h-100 border-danger">
               <div class="card-header bg-danger text-white py-1">Implementation Cost
-                <i class="fas fa-info-circle info-icon"
-                   title="Implementation rate multiplied by implementation time."></i>
-                    <style>
-                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
-                      .card-header .info-icon { color: #ffffff !important; }
-                    </style>
+                <i class="fas fa-info-circle info-icon" title="Implementation rate multiplied by implementation time."></i>
               </div>
               <div class="card-body">
                 <span id="summary-implementation-cost" class="fs-5">-</span>
@@ -177,12 +193,8 @@
           </div>
           <div class="col">
             <div class="card shadow-sm h-100 border-danger">
-              <div class="card-header bg-danger text-white py-1">Yearly Operations Cost<i class="fas fa-info-circle info-icon"
-                   title="30 process per an operations developer, who works %20 in operations is assumed."></i>
-                    <style>
-                      /* Sadece kart başlığındaki info ikonları beyaz olsun */
-                      .card-header .info-icon { color: #ffffff !important; }
-                    </style>
+              <div class="card-header bg-danger text-white py-1">Yearly Operations Cost
+                <i class="fas fa-info-circle info-icon" title="30 process per an operations developer, who works %20 in operations is assumed."></i>
               </div>
               <div class="card-body">
                 <span id="summary-operations-cost" class="fs-5">-</span>
@@ -191,69 +203,95 @@
           </div>
         </div>
         <hr class="my-4">
-        <div class="card shadow-sm p-3 mb-3">
-        <canvas id="roiChart" height="200"></canvas>
-        </div>
-        <button id="btn-save" class="btn btn-outline-primary">
-          Save Business Case<i class="fas fa-download"></i>
-        </button>
-      </div>
 
-      <!-- Bootstrap JS -->
+        <!--
+        
+        <div class="card shadow-sm p-3 mb-3 chart-container">
+          <canvas id="roiChart" height="200"></canvas>
+        </div> -->
+        <!-- ROI Chart : full-width under the 2nd card row -->
+<div class="row g-3">
+  <div class="col-12">        <!-- tek sütun = tüm satırı kaplar -->
+    <div class="card shadow-sm p-3 mb-3">
+      <!-- canvas artık %100 genişlikte -->
+      <canvas id="roiChart" class="w-100" style="height:300px;"></canvas>
+    </div>
+  </div>
+</div>
+
+        
+        <button id="btn-save" class="btn btn-outline-primary">
+          Save Business Case <i class="fas fa-download"></i>
+        </button>
+      </div><!-- /Business tab -->
+    </div><!-- /tab-content -->
+  </div><!-- /container -->
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    let roiChart=null;
+    let roiChart = null;
 
-    function calcValues(){
-      // Inputs
-      const processName=document.getElementById('process-name').value;
-      const avgMin=parseFloat(document.getElementById('avg-processing-time').value||0);
-      const freq=document.getElementById('frequency-select').value;
-      const timesPerYear={Daily:220,Weekly:52,Monthly:12,Quarterly:4,Yearly:1}[freq]||0;
-      const yearlyHours=(avgMin/60)*timesPerYear;
-  
-      // Data values
-      const dailyHours=parseFloat(document.getElementById('daily-hours').value||0);
-      const bizRateDaily=parseFloat(document.getElementById('biz-rate').value||0);
-      const benefit=yearlyHours*(bizRateDaily/dailyHours);
-
-      const implTime=parseFloat(document.getElementById('impl-time').value||0);
-      const implRate=parseFloat(document.getElementById('impl-rate').value||0);
-      const implementationCost=implTime*implRate;
-      const operationsCost = implRate * 260 * 0.2 / 30;
-      
-      const orchCost=parseFloat(document.getElementById('orch-cost').value||0);
-      const studioCostUnit=parseFloat(document.getElementById('studio-cost').value||0);
-      const studioLicenses=parseFloat(document.getElementById('num-studio').value||0);
-      const robotCostUnit=parseFloat(document.getElementById('robot-cost').value||0);
-      const numRobots=parseFloat(document.getElementById('num-robots').value||1);
-      const licenseComponent=((orchCost+studioCostUnit*studioLicenses)/numRobots)+robotCostUnit;
-      const licenseCost=licenseComponent*(yearlyHours/19440); // 24 (hours in a day) * 30 (day in month) * 12 (months in year) * 0.75 (robot utilization) * 3 (robot is faster than human) 
-		
-      return {processName,yearlyHours,benefit,implementationCost,licenseCost,operationsCost};
+    // ------- Utility -------
+    /**
+     * Helper to safely parse a number from an input field.
+     * Returns 0 when the field is empty or NaN.
+     */
+    function num (id) {
+      return parseFloat(document.getElementById(id).value) || 0;
     }
 
-    function updateUI(){
-      const v=calcValues();
-      document.getElementById('summary-process-name').textContent=v.processName||'-';
-      document.getElementById('summary-hour-saving').textContent=Math.round(v.yearlyHours)+' hours';
-      document.getElementById('summary-benefit').textContent=Math.round(v.benefit)+' EUR';
-      document.getElementById('summary-implementation-cost').textContent=Math.round(v.implementationCost)+' EUR';
-      document.getElementById('summary-uipath-license-cost').textContent=Math.round(v.licenseCost)+' EUR';
-      document.getElementById('summary-operations-cost').textContent = Math.round(v.operationsCost) + ' EUR';
+    // ------- Core logic -------
+    function calcValues () {
+      // Inputs
+      const processName = document.getElementById('process-name').value.trim();
+      const avgMin      = num('avg-processing-time');
+      const freq        = document.getElementById('frequency-select').value;
+      const timesPerYear = { Daily: 220, Weekly: 52, Monthly: 12, Quarterly: 4, Yearly: 1 }[freq] || 0;
+      const yearlyHours = (avgMin / 60) * timesPerYear;
 
-      // chart data (net cumulative benefit)
-      const months = [...Array(13).keys()].map(i => `M${i}`); // M0..M12
+      // Cost & rate data
+      const dailyHours   = num('daily-hours');
+      const bizRateDaily = num('biz-rate');
+      const benefit      = yearlyHours * (bizRateDaily / (dailyHours || 1));
+
+      const implTime            = num('impl-time');
+      const implRate            = num('impl-rate');
+      const implementationCost  = implTime * implRate;
+      const operationsCost      = implRate * 260 * 0.2 / 30;
+
+      const orchCost        = num('orch-cost');
+      const studioCostUnit  = num('studio-cost');
+      const studioLicenses  = num('num-studio');
+      const robotCostUnit   = num('robot-cost');
+      const numRobots       = num('num-robots') || 1;
+      const licenseComponent = ((orchCost + studioCostUnit * studioLicenses) / numRobots) + robotCostUnit;
+      const licenseCost      = licenseComponent * (yearlyHours / 19440); // 24*30*12*0.75*3
+
+      return { processName, yearlyHours, benefit, implementationCost, licenseCost, operationsCost };
+    }
+
+    function updateUI () {
+      const v = calcValues();
+      document.getElementById('summary-process-name').textContent       = v.processName || '-';
+      document.getElementById('summary-hour-saving').textContent        = Math.round(v.yearlyHours) + ' hours';
+      document.getElementById('summary-benefit').textContent            = Math.round(v.benefit) + ' EUR';
+      document.getElementById('summary-implementation-cost').textContent= Math.round(v.implementationCost) + ' EUR';
+      document.getElementById('summary-uipath-license-cost').textContent= Math.round(v.licenseCost) + ' EUR';
+      document.getElementById('summary-operations-cost').textContent    = Math.round(v.operationsCost) + ' EUR';
+
+      // ----- ROI chart -----
+      const months         = [...Array(13).keys()].map(i => `M${i}`); // M0..M12
       const monthlyBenefit = v.benefit / 12;
       const monthlyLicense = v.licenseCost / 12;
-      const monthlyOps = v.operationsCost / 12;
-      const monthlyNet = monthlyBenefit - monthlyLicense - monthlyOps;       // net gain per month
-      const cumNet = months.map((_, i) => Math.round(-v.implementationCost + monthlyNet * i));
+      const monthlyOps     = v.operationsCost / 12;
+      const monthlyNet     = monthlyBenefit - monthlyLicense - monthlyOps; // net per month
+      const cumNet         = months.map((_, i) => Math.round(-v.implementationCost + monthlyNet * i));
 
-      // first month (after M0) where cumulative net crosses >= 0
+      // First breakeven month after M0
       const highlightIdx = cumNet.findIndex((val, idx) => idx > 0 && val >= 0);
-      const pointColors = cumNet.map((_, i) => i === highlightIdx ? '#ff0000' : '#00aa00');
-      const pointSizes  = cumNet.map((_, i) => i === highlightIdx ? 6 : 3);
+      const pointColors  = cumNet.map((_, i) => i === highlightIdx ? '#ff0000' : '#00aa00');
+      const pointSizes   = cumNet.map((_, i) => i === highlightIdx ? 6 : 3);
 
       if (!roiChart) {
         const ctx = document.getElementById('roiChart').getContext('2d');
@@ -273,145 +311,113 @@
             }]
           },
           options: {
-  responsive: true,
-  maintainAspectRatio: false,
-
-  plugins: {
-    title: {
-        display: true,
-        text: 'Breakeven Point Analysis'        // Grafiğin tepesindeki başlık
-      },
-    legend: { display: false }        // başlık çubuğunu sakla
-  },
-
-  scales: {
-    x: {
-      grid: { display: false },       // dikey ızgara yok
-      ticks:{ color:'#666' },
-      title: {
-          display: true,
-          text: 'Time'              // X ekseni etiketi
-        },
-    },
-    y: {
-      grid: {                         // yatay çizgileri çok açık ton
-        drawBorder:false,
-        color:'rgba(0,0,0,0.05)'
-      },
-      ticks:{ precision:0, color:'#666' },
-      title: {
-          display: true,
-          text: 'Benefit'           // Y ekseni etiketi
-        },
-    }
-  }
-}
-
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: { display: true, text: 'Breakeven Point Analysis' },
+              legend: { display: false }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#666' },
+                title: { display: true, text: 'Time' }
+              },
+              y: {
+                grid: { drawBorder: false, color: 'rgba(0,0,0,0.05)' },
+                ticks: { precision: 0, color: '#666' },
+                title: { display: true, text: 'Benefit' }
+              }
+            }
+          }
         });
       } else {
-        roiChart.data.labels = months;
-        roiChart.data.datasets[0].data = cumNet;
-        roiChart.data.datasets[0].backgroundColor = pointColors;
-        roiChart.data.datasets[0].pointRadius = pointSizes;
-        roiChart.data.datasets[0].pointHoverRadius = pointSizes;
+        roiChart.data.labels                          = months;
+        roiChart.data.datasets[0].data               = cumNet;
+        roiChart.data.datasets[0].backgroundColor    = pointColors;
+        roiChart.data.datasets[0].pointRadius        = pointSizes;
+        roiChart.data.datasets[0].pointHoverRadius   = pointSizes;
         roiChart.update();
       }
-      }
-	async function submitToDatabase() {
-  const result = collectCSVData(); // Gather all input + summary data
- 
-  try {
-    const response = await fetch("https://automation.infinityfreeapp.com/save_data.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams(result)
-    });
- 
-    const serverMessage = await response.text();
-    alert(serverMessage); // Shows "✅ Success: Data saved!" if successful
-  } catch (error) {
-    alert("❌ Failed to submit data: " + error.message);
-  }
-}
+    }
+
+    // Gather inputs + computed summaries as an object
     function collectCSVData () {
-    // tüm Inputs + Data <input>/<select>/<textarea> elemanları
-    const fields = document.querySelectorAll(
-      '#inputs input, #inputs select, #inputs textarea,' +
-      '#data   input, #data   select');
-    const result = {};
+      const fields = document.querySelectorAll('#inputs input, #inputs select, #inputs textarea, #data input, #data select');
+      const result = {};
 
-    fields.forEach(el => {
-      const key = el.id || el.name || 'unnamed';
-      result[key] = el.value;
+      fields.forEach(el => {
+        result[el.id || el.name || 'unnamed'] = el.value;
+      });
+
+      updateUI(); // ensure latest
+
+      result.summary_hour_saving         = document.getElementById('summary-hour-saving').textContent;
+      result.summary_benefit             = document.getElementById('summary-benefit').textContent;
+      result.summary_implementation_cost = document.getElementById('summary-implementation-cost').textContent;
+      result.summary_license_cost        = document.getElementById('summary-uipath-license-cost').textContent;
+      result.summary_operations_cost     = document.getElementById('summary-operations-cost').textContent;
+      return result;
+    }
+
+    // Download a single‑line CSV
+    function downloadCSV (obj) {
+      const header = Object.keys(obj).join(',') + '\n';
+      const body   = Object.values(obj).join(',') + '\n';
+      const blob   = new Blob([header + body], { type: 'text/csv' });
+      const url    = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'automation_case_' + Date.now() + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Submit data to database (dummy endpoint example)
+    async function submitToDatabase () {
+      const result = collectCSVData();
+      try {
+        const response = await fetch('https://sql113.infinityfree.com/save_data.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(result)
+        });
+        const serverMessage = await response.text();
+        alert(serverMessage);
+      } catch (error) {
+        alert('❌ Failed to submit data: ' + error.message);
+      }
+    }
+
+    // ------------------ EVENT BINDINGS ------------------
+
+    // Run update when Business Case tab becomes visible
+    document.getElementById('business-tab').addEventListener('shown.bs.tab', updateUI);
+
+    // Save button (download CSV + submit)
+    document.addEventListener('DOMContentLoaded', () => {
+      const saveBtn = document.getElementById('btn-save');
+      saveBtn.addEventListener('click', () => {
+        const csvObj = collectCSVData();
+        downloadCSV(csvObj);
+        submitToDatabase();
+      });
     });
 
-    // Business-Case metriklerini önce güncelle, sonra al
-    updateUI();
-    result.summary_hour_saving         = document.getElementById('summary-hour-saving').textContent;
-    result.summary_benefit             = document.getElementById('summary-benefit').textContent;
-    result.summary_implementation_cost = document.getElementById('summary-implementation-cost').textContent;
-    result.summary_license_cost        = document.getElementById('summary-uipath-license-cost').textContent;
-    result.summary_operations_cost     = document.getElementById('summary-operations-cost').textContent;
-
-    return result;
-  }
-
-  // tek satırlık CSV oluştur ve indir
-  function downloadCSV (obj) {
-    const header = Object.keys(obj).join(',') + '\n';
-    const body   = Object.values(obj).join(',') + '\n';
-    const blob   = new Blob([header + body], { type: 'text/csv' });
-    const url    = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'automation_case_' + Date.now() + '.csv';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  // ------------------ OLAY BAĞLANTILARI ------------------
-  document.getElementById('business-tab')
-          .addEventListener('click', updateUI);
-
-  // “Save CSV” düğmesi
-  // Sayfa tamamen yüklendikten sonra çalışsın
-document.addEventListener('DOMContentLoaded', () => {
-  const saveBtn = document.getElementById('btn-save');
-
-  saveBtn.addEventListener('click', () => {
-    // 1) CSV indir
-    if (typeof downloadCSV === 'function') {
-      downloadCSV();
-    }
-    // 2) Veritabanına submit et
-    if (typeof submitToDatabase === 'function') {
-      submitToDatabase();
-    }
-  });
-});
-
-    // update when Business Case tab shown
-    document.getElementById('business-tab').addEventListener('click',updateUI);
-
-    // Sayfa tamamen yüklendiğinde çalışacak
+    // Application suggestions (localStorage)
     document.addEventListener('DOMContentLoaded', () => {
       const dl    = document.getElementById('app-list');
       const input = document.getElementById('applications');
 
-      // 2.a) Önceden saklanan önerileri yükle
-      JSON.parse(localStorage.getItem('appSuggestions')||'[]')
-        .forEach(val => {
-          const opt = document.createElement('option');
-          opt.value = val;
-          dl.appendChild(opt);
-        });
+      JSON.parse(localStorage.getItem('appSuggestions') || '[]').forEach(val => {
+        const opt = document.createElement('option');
+        opt.value = val;
+        dl.appendChild(opt);
+      });
 
-      // 2.b) Her değişiklikte yeni girdiyi kaydet
       input.addEventListener('change', () => {
         const v = input.value.trim();
         if (!v) return;
@@ -419,13 +425,12 @@ document.addEventListener('DOMContentLoaded', () => {
           const opt = document.createElement('option');
           opt.value = v;
           dl.appendChild(opt);
-          const arr = JSON.parse(localStorage.getItem('appSuggestions')||'[]');
+          const arr = JSON.parse(localStorage.getItem('appSuggestions') || '[]');
           arr.push(v);
           localStorage.setItem('appSuggestions', JSON.stringify(arr));
         }
       });
     });
-    
   </script>
 </body>
 </html>
