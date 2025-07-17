@@ -29,33 +29,21 @@
   const TENANT_NAME = "Global";  // Örn: default
   const AUTH_TOKEN = "0d5c7235-8fa1-41a3-9342-46dcc40cb94f/042545da-950d-44d3-9209-19069ac92be7"; // Bearer için tüm string
 
-  async function fetchIdeasCount() {
-    const url = `https://cloud.uipath.com/${ORG_NAME}/${TENANT_NAME}/automationhub_/api/v1/openapi/automations?page=1&pageSize=1`;
+  const API_PROXY = "https://<senin-worker-adin>.workers.dev";
 
-    try {
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${AUTH_TOKEN}`,
-          "x-ah-openapi-auth": "openapi-token"
-          // Eğer App Key tanımlıysa ekleyin:
-          // "x-ah-openapi-app-key": "<app_key>"
-        }
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
-      document.getElementById("count").textContent =
-        data?.data?.totalItems ?? "0";
-    } catch (err) {
-      console.error(err);
-      document.getElementById("count").textContent = "Hata!";
-    }
+async function fetchIdeasCount() {
+  try {
+    const res = await fetch(API_PROXY);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    document.getElementById("count").textContent =
+      data?.data?.totalItems ?? "0";
+  } catch (e) {
+    console.error(e);
+    document.getElementById("count").textContent = "Hata!";
   }
+}
+
 
   document.addEventListener("DOMContentLoaded", fetchIdeasCount);
   document.getElementById("refresh").addEventListener("click", fetchIdeasCount);
