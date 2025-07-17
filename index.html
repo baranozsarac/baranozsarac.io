@@ -1,48 +1,427 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Automation Hub Idea Sayacı</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 2rem; text-align: center; background:#f5f7fa; color:#333; }
-  h1 { font-size: 2rem; margin-bottom: .5rem; }
-  #count { font-size: 4rem; font-weight: bold; margin: 1rem 0; }
-  button { padding: .5rem 1rem; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; background: #0066ff; color: #fff; }
-  button:hover { opacity: 0.9; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automation Hub Dashboard</title>
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    body{min-height:100vh;background:url('https://about.puma.com/sites/default/files/styles/dd_hero_tablet/public/media/hero/images/low-res-2000x2000-25ss-br-brand-campaign-running-run-club-deviate-klfeb-74522-rgb.png?itok=WCn3_3Ap')center/cover fixed;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif}
+    .dashboard-wrapper{backdrop-filter:blur(6px);background:rgba(255,255,255,.9);border-radius:1rem;padding:2.5rem 2rem;width:100%;max-width:1200px}
+    .chart-container{width:280px;height:280px;margin:0 auto;position:relative}
+    .bar-container{width:100%;height:540px;margin:0 auto;position:relative}
+    @media(max-width:992px){.chart-container{width:220px;height:220px}.bar-container{height:420px}}
+  </style>
 </head>
 <body>
-  <h1>Automation Hub'daki Toplam Fikir Sayısı</h1>
-  <div id="count">...</div>
-  <button id="refresh">Yenile</button>
+  <div class="dashboard-wrapper">
+    <h1 class="text-center mb-4">Intelligent Automation EUROPE</h1>
 
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="dashboardTabs">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#metricsPane">Dashboards</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#businessPane">Business Case</button></li>
+    </ul>
+
+    <div class="tab-content mt-3">
+      <!-- Metrics Pane -->
+      <div class="tab-pane fade show active" id="metricsPane">
+        <div id="loading" class="text-center my-4">
+          <div class="spinner-border text-danger" role="status"></div>
+          <p class="mt-2 fw-semibold">Fetching data…</p>
+        </div>
+        <div id="metrics" class="d-none">
+          <div class="row justify-content-center text-center gy-4">
+            <div class="col-md-6">
+              <div class="chart-container"><canvas id="statusChart"></canvas></div>
+              <p class="fw-semibold mt-2">Live Process Breakdown</p>
+            </div>
+            <div class="col-md-6">
+              <div class="chart-container"><canvas id="countryChart"></canvas></div>
+              <p class="fw-semibold mt-2">Country Breakdown</p>
+            </div>
+          </div>
+          <!-- Filters -->
+          <div class="row justify-content-center align-items-center mb-3 mt-4">
+            <div class="col-auto"><select id="countryFilter" class="form-select form-select-sm"></select></div>
+            <div class="col-auto"><select id="yearFilter" class="form-select form-select-sm"></select></div>
+          </div>
+          <!-- Department Breakdown -->
+          <div class="row justify-content-center text-center gy-4">
+            <div class="col-12">
+              <div class="bar-container"><canvas id="deptComboChart"></canvas></div>
+              <p class="fw-semibold mt-2">Department Breakdown</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Case Pane -->
+      <div class="tab-pane fade" id="businessPane">
+        <!-- Parameters -->
+        <div id="parameters" class="row gy-2 mt-4">
+          <h3 class="h5 fw-bold text-center mb-3">Cost & Effort Parameters</h3>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="orcCost" class="form-label mb-0 fw-semibold">UIPath Orchestrator cost (EUR)</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="orcCost" class="form-control" value="35000" min="0"></div>
+          </div>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="robotLicenseCost" class="form-label mb-0 fw-semibold">UIPath Robot license cost (EUR)</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="robotLicenseCost" class="form-control" value="5500" min="0"></div>
+          </div>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="studioLicenseCost" class="form-label mb-0 fw-semibold">UIPath Studio license cost (EUR)</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="studioLicenseCost" class="form-control" value="3500" min="0"></div>
+          </div>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="robotCount" class="form-label mb-0 fw-semibold">How many UIPath robots are connected?</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="robotCount" class="form-control" value="15" min="0"></div>
+          </div>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="studioCount" class="form-label mb-0 fw-semibold">How many Studio licenses are used?</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="studioCount" class="form-control" value="15" min="0"></div>
+          </div>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="implDailyRate" class="form-label mb-0 fw-semibold">Daily rate of Implementation (EUR)</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="implDailyRate" class="form-control" value="350" min="0"></div>
+          </div>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="bizDailyRate" class="form-label mb-0 fw-semibold">Daily rate of business team (EUR)</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="bizDailyRate" class="form-control" value="150" min="0"></div>
+          </div>
+          <div class="row align-items-center g-2 mb-2">
+            <div class="col-md-8">
+              <label for="devTeam" class="form-label mb-0 fw-semibold">Number of development team members</label>
+            </div>
+            <div class="col-md-4"><input type="number" id="devTeam" class="form-control" value="7" min="0"></div>
+          </div>
+        </div>
+
+        <!-- Business Case Metrics -->
+        <h3 class="h5 fw-bold text-center my-4">Business Case Metrics</h3>
+        <style>.card-header .info-icon{color:#fff!important}</style>
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100 border-0">
+              <div class="card-header text-white py-1" style="background:#dc3545;">Annual Manual Hour Saving <i class="fas fa-info-circle info-icon" title="Declared hours by business departments during discovery."></i></div>
+              <div class="card-body"><span id="metricHours" class="fs-5">- hrs</span></div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100 border-0">
+              <div class="card-header text-white py-1" style="background:#dc3545;">Annual Gross Benefit <i class="fas fa-info-circle info-icon" title="(Daily rate of business team × total hrs saved) ÷ 8."></i></div>
+              <div class="card-body"><span id="metricGross" class="fs-5">€ -</span></div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100 border-0">
+              <div class="card-header text-white py-1" style="background:#dc3545;">Annual UiPath License Cost <i class="fas fa-info-circle info-icon" title="Orchestrator + Automation Hub + (Robot lic. × robot count) + (Studio lic. × studio count)."></i></div>
+              <div class="card-body"><span id="metricLicense" class="fs-5">€ -</span></div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100 border-0">
+              <div class="card-header text-white py-1" style="background:#dc3545;">Annual Operations Cost <i class="fas fa-info-circle info-icon" title="Implementation daily rate × dev team size × 220 days."></i></div>
+              <div class="card-body"><span id="metricOps" class="fs-5">€ -</span></div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100 border-0">
+              <div class="card-header text-white py-1" style="background:#dc3545;">Annual Net Benefit <i class="fas fa-info-circle info-icon" title="Gross Benefit – License Cost – Operations Cost."></i></div>
+              <div class="card-body"><span id="metricNet" class="fs-5">€ -</span></div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100 border-0">
+              <div class="card-header text-white py-1" style="background:#dc3545;">Annual FTE Savings <i class="fas fa-info-circle info-icon" title="Annual hours saved / (220*8)"></i></div>
+              <div class="card-body"><span id="metricFTE" class="fs-5">- FTE</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-  /*
-   * Basit tek sayfa uygulaması:
-   * Automation Hub API'dan tüm fikir (Idea) sayısını çeker ve gösterir.
-   * 1. Aşağıdaki üç sabiti kendi ortamınıza göre doldurun.
-   * 2. Sayfayı GitHub Pages ya da benzeri bir yerde barındırın.
-   * 3. Sayfa yüklendiğinde ve Yenile butonuna basıldığında sayı güncellenir.
-   */
+    /* ===================== CONSTANTS & GLOBALS ===================== */
+    const WORKER_ENDPOINT = "https://late-cake-3ef3.mbaranozsarac.workers.dev/"; // Cloudflare Worker URL
+    const PAGE_SIZE = 1000;             // Records per request (tweak if needed)
+    const CURRENT_YEAR = new Date().getFullYear();
+    const countryMap = { DE:"Germany", AU:"Australia", IN:"India", ME:"Mexico", TR:"Turkey", PL:"Poland", UA:"Ukraine", HK:"Hong Kong", TW:"Taiwan", BD:"Bangladesh", "/A":"N/A", JP:"Japan", KR:"S. Korea", UK:"United Kingdom" };
 
-  const API_PROXY = "https://late-cake-3ef3.mbaranozsarac.workers.dev/";
+    let charts = [];         // Chart.js instances
+    let deptChart = null;    // Combo chart ref
+    let allLiveRows = [];    // Cache for filters
 
-async function fetchIdeasCount() {
-  try {
-    const res = await fetch(API_PROXY);
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    document.getElementById("count").textContent =
-      data?.data?.totalItems ?? "0";
-  } catch (e) {
-    console.error(e);
-    document.getElementById("count").textContent = "Hata!";
-  }
-}
+    /* ===================== PLUGIN: Center Text for Doughnut ===================== */
+    Chart.register({
+      id:"centerText",
+      afterDraw(chart,args,opts){
+        if(chart.config.type!=="doughnut" || !chart.data.datasets.length) return;
+        const {ctx,chartArea:{left,right,top,bottom}} = chart;
+        const val = (opts?.type || "total") === "categories"
+          ? chart.data.labels.length
+          : chart.data.datasets[0].data.reduce((x,y)=>x+y,0);
+        ctx.save();
+        ctx.font = "600 1rem Inter, sans-serif";
+        ctx.fillStyle = "#000";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(val,(left+right)/2,(top+bottom)/2);
+        ctx.restore();
+      }
+    });
 
+    /* ===================== DOM ELEMENTS ===================== */
+    const countrySelect = document.getElementById("countryFilter");
+    const yearSelect    = document.getElementById("yearFilter");
 
-  document.addEventListener("DOMContentLoaded", fetchIdeasCount);
-  document.getElementById("refresh").addEventListener("click", fetchIdeasCount);
+    countrySelect.addEventListener("change", applyFilters);
+    yearSelect.addEventListener("change", applyFilters);
+
+    /* ===================== INIT: Fetch Data then Build ===================== */
+    (async function init(){
+      try{
+        const data = await fetchAllAutomations();
+        if(!data.length){
+          throw new Error("No data returned");
+        }
+        buildDashboard(data);
+        refreshBusinessCase(data);
+        document.getElementById("loading").classList.add("d-none");
+        document.getElementById("metrics").classList.remove("d-none");
+      }catch(err){
+        console.error(err);
+        document.getElementById("loading").innerHTML =
+          `<p class='text-danger fw-semibold'>Failed to fetch data: ${err.message}</p>`;
+      }
+    })();
+
+    /* ===================== FETCH HELPERS ===================== */
+    async function fetchPage(page=1){
+      const url = `${WORKER_ENDPOINT}?page=${page}&pageSize=${PAGE_SIZE}`;
+      const res = await fetch(url);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json(); // Support various envelope shapes
+      const list = json.data || json.value || json.items || json;
+      return { list, total: json.totalCount ?? list.length };
+    }
+
+    async function fetchAllAutomations(){
+      let all = [];
+      let page = 1;
+      while(true){
+        const { list, total } = await fetchPage(page);
+        if(!list.length) break;
+        all = all.concat(list);
+        if(all.length >= total) break;
+        page++;
+      }
+      return all.map(transformAutomationToRow);
+    }
+
+    /* ===================== TRANSFORM: API -> Old CSV Row ===================== */
+    function transformAutomationToRow(a){
+      return {
+        "Automation ID": a.id || a.automationId || "",
+        "Launch Date": a.launchDate || a.pipelineLaunchDate || "",
+        "Benefit per company (hours saved/year)": a.annualHoursSaved || a.benefitHours || 0,
+        "Status": (a.status?.name || a.status || "").trim(),
+        "Business Area": a.department?.name || a.businessArea?.name || a.department || ""
+      };
+    }
+
+    /* ===================== FILTERS & CHART BUILD ===================== */
+    function applyFilters(){
+      if(!allLiveRows.length) return;
+      const cSel = countrySelect.value;
+      const ySel = yearSelect.value;
+      let rows = allLiveRows.slice();
+      if(cSel !== "Global"){
+        rows = rows.filter(r => getCountryName(r) === cSel);
+      }
+      if(ySel !== "All Years"){
+        rows = rows.filter(r => getLaunchYear(r["Launch Date"]) === +ySel);
+      }
+      buildDeptChart(rows);
+    }
+
+    function populateCountryFilter(obj){
+      countrySelect.innerHTML = "";
+      addOpt(countrySelect,"Global","Global");
+      Object.keys(obj).forEach(name => addOpt(countrySelect,name,name));
+    }
+    function populateYearFilter(set){
+      yearSelect.innerHTML = "";
+      addOpt(yearSelect,"All Years","All Years");
+      Array.from(set).sort().forEach(y => addOpt(yearSelect,y,y));
+    }
+    function addOpt(sel,val,txt){
+      const o = document.createElement("option");
+      o.value = val;
+      o.textContent = txt;
+      sel.appendChild(o);
+    }
+
+    /* ===================== CHART HELPERS ===================== */
+    const baseOpts = {
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{},
+        tooltip:{
+          callbacks:{
+            label(ctx){
+              const v = typeof ctx.parsed === "object" ? (ctx.parsed.x ?? ctx.parsed.y) : ctx.parsed;
+              return `${ctx.dataset.label || ctx.label}: ${v}`;
+            }
+          }
+        }
+      }
+    };
+
+    const makeDoughnut = (el,data,mode) => new Chart(el,{
+      type:"doughnut",
+      data:{
+        labels:Object.keys(data),
+        datasets:[{ data:Object.values(data), hoverOffset:6 }]
+      },
+      options:{
+        ...baseOpts,
+        plugins:{ ...baseOpts.plugins, centerText:{ type:mode } }
+      }
+    });
+
+    const makeCombo = (el,labels,bar,line) => new Chart(el,{
+      type:"bar",
+      data:{
+        labels,
+        datasets:[
+          { label:"Benefit (hrs p.a.)", type:"bar", data:bar, borderRadius:4, maxBarThickness:26 },
+          { label:"Process Count", type:"line", data:line, tension:.3, fill:false, pointRadius:3, borderWidth:2 }
+        ]
+      },
+      options:{
+        ...baseOpts,
+        indexAxis:"y",
+        scales:{
+          x:{ beginAtZero:true, title:{display:true,text:"Benefit (hrs p.a.)"} },
+          x1:{ beginAtZero:true, position:"top", grid:{ drawOnChartArea:false }, title:{display:true,text:"Process Count"} }
+        }
+      }
+    });
+
+    /* ===================== DASHBOARD BUILDERS ===================== */
+    function buildDashboard(rows){
+      charts.forEach(c => c.destroy());
+      charts=[];
+      const live = rows.filter(r => r.Status && r.Status.toLowerCase() !== "decommissioned");
+      allLiveRows = live;
+      const tally = (arr,fn) => arr.reduce((o,i)=>{
+        const k = fn(i);
+        if(k) o[k] = (o[k] || 0) + 1;
+        return o;
+      },{});
+      const status  = tally(live,r => r.Status);
+      const country = tally(live,r => getCountryName(r));
+      charts.push(makeDoughnut(document.getElementById("statusChart"), status, "total"));
+      charts.push(makeDoughnut(document.getElementById("countryChart"), country, "categories"));
+      const yearSet = new Set(live.map(r => getLaunchYear(r["Launch Date"])));
+      populateCountryFilter(country);
+      populateYearFilter(yearSet);
+      buildDeptChart(live);
+    }
+
+    function buildDeptChart(rows){
+      const deptCount={}, benefitDept={};
+      rows.forEach(r=>{
+        const d = r["Business Area"];
+        if(!d) return;
+        deptCount[d] = (deptCount[d] || 0) + 1;
+        const h = parseFloat(r["Benefit per company (hours saved/year)"] || 0);
+        benefitDept[d] = (benefitDept[d] || 0) + h;
+      });
+      const depts = Object.keys(deptCount);
+      const bars  = depts.map(d => benefitDept[d] || 0);
+      const lines = depts.map(d => deptCount[d]);
+      const totalBenefit = bars.reduce((a,b)=>a+b,0);
+      const totalCount   = lines.reduce((a,b)=>a+b,0);
+      depts.push("Total");
+      bars.push(totalBenefit);
+      lines.push(totalCount);
+      if(deptChart) deptChart.destroy();
+      deptChart = makeCombo(document.getElementById("deptComboChart"), depts, bars, lines);
+    }
+
+    /* ===================== BUSINESS CASE ===================== */
+    function refreshBusinessCase(rows){
+      const live = rows.filter(r => r.Status && r.Status.toLowerCase() !== "decommissioned");
+      // Total annual benefit hours
+      const totalBenefit = live.reduce((sum,r)=>
+        sum + parseFloat(r["Benefit per company (hours saved/year)"] || 0), 0);
+      document.getElementById("metricHours").textContent = totalBenefit.toFixed(0) + " hrs";
+
+      const FTE_HOURS_PER_YEAR = 220*8;
+      const fte = totalBenefit / FTE_HOURS_PER_YEAR;
+      document.getElementById("metricFTE").textContent = fte.toFixed(1);
+
+      const bizRate = parseFloat(document.getElementById("bizDailyRate").value || 0);
+      const gross = (bizRate * totalBenefit) / 8;
+      document.getElementById("metricGross").textContent = `€ ${gross.toFixed(0)}`;
+
+      const orc   = +document.getElementById("orcCost").value;
+      const rLic  = +document.getElementById("robotLicenseCost").value;
+      const rCnt  = +document.getElementById("robotCount").value;
+      const sLic  = +document.getElementById("studioLicenseCost").value;
+      const sCnt  = +document.getElementById("studioCount").value;
+      const licCost = orc + rLic*rCnt + sLic*sCnt;
+      document.getElementById("metricLicense").textContent = `€ ${licCost.toFixed(0)}`;
+
+      const implRate = +document.getElementById("implDailyRate").value;
+      const devTeam  = +document.getElementById("devTeam").value;
+      const opsCost = implRate * devTeam * 220;
+      document.getElementById("metricOps").textContent = `€ ${opsCost.toFixed(0)}`;
+
+      const net = gross - licCost - opsCost;
+      document.getElementById("metricNet").textContent = `€ ${net.toFixed(0)}`;
+    }
+
+    // Update metrics when parameter inputs change
+    document.querySelectorAll('#parameters input').forEach(el =>
+      el.addEventListener('input',() => refreshBusinessCase(allLiveRows))
+    );
+
+    /* ===================== UTILITIES ===================== */
+    function getCountryName(row){
+      const id = (row["Automation ID"] || "").split('-')[0];
+      const code = id.slice(1,3).toUpperCase();
+      return countryMap[code] || code || "N/A";
+    }
+    function getLaunchYear(dateStr){
+      if(!dateStr) return CURRENT_YEAR;
+      const yr = new Date(dateStr).getFullYear();
+      return isNaN(yr) ? CURRENT_YEAR : yr;
+    }
   </script>
 </body>
 </html>
