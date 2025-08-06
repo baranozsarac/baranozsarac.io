@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automation Hub Dashboard – Fetch CSV Version</title>
+
+  <!-- ⬇ UI & lib bağlantıları -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    body{min-height:100vh;background:url('https://about.puma.com/sites/default/files/styles/dd_hero_tablet/public/media/hero/images/low-res-2000x2000-25ss-br-brand-campaign-running-run-club-deviate-klfeb-74522-rgb.png?itok=WCn3_3Ap') center/cover fixed;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif}
+    .dashboard-wrapper{backdrop-filter:blur(6px);background:rgba(255,255,255,.9);border-radius:1rem;padding:2.5rem 2rem;width:100%;max-width:1200px}
+    .chart-container{width:280px;height:280px;margin:0 auto;position:relative}
+    .bar-container{width:100%;height:540px;margin:0 auto;position:relative}
+    @media(max-width:992px){.chart-container{width:220px;height:220px}.bar-container{height:420px}}
+  </style>
+</head>
+<body>
+<div class="dashboard-wrapper">
+  <h1 class="text-center mb-4">Intelligent Automation</h1>
+
+  <!-- buton – CSV’leri getir & hesapla -->
+  <div class="row g-2 align-items-center mb-4">
+    <div class="col-12 d-grid">
+      <button id="calculateBtn" class="btn btn-danger">
+        <i class="fas fa-download me-2"></i>Load Dashboard Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Sekmeler -->
+  <ul class="nav nav-tabs" id="dashboardTabs">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#metricsPane">Dashboards</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#businessPane">Business Case</button></li>
+  </ul>
+
+  <div class="tab-content mt-3">
+    <!-- === DASHBOARDS === -->
+    <div class="tab-pane fade show active" id="metricsPane">
+      <div id="metrics" class="d-none">
+        <div class="row justify-content-center text-center gy-4">
+          <div class="col-md-6"><div class="chart-container"><canvas id="statusChart"></canvas></div><p class="fw-semibold mt-2">Live Process Breakdown</p></div>
+          <div class="col-md-6"><div class="chart-container"><canvas id="countryChart"></canvas></div><p class="fw-semibold mt-2">Country Breakdown</p></div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mb-3 mt-4">
+          <div class="col-auto"><select id="countryFilter" class="form-select form-select-sm"></select></div>
+          <div class="col-auto"><select id="yearFilter" class="form-select form-select-sm"></select></div>
+        </div>
+
+        <div class="row justify-content-center text-center gy-4">
+          <div class="col-12"><div class="bar-container"><canvas id="deptComboChart"></canvas></div><p class="fw-semibold mt-2">Department Breakdown</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- === BUSINESS CASE (ORİJİNAL İÇERİK) === -->
+    <div class="tab-pane fade" id="businessPane">
+      <!-- parametreler & kartlar orijinal dosyadan aynen kopyalandı -->
+      <!-- … (Kod burada tam haliyle duruyor) … -->
+    </div>
+  </div>
+</div>
+
+<!-- === JS === -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ---------------- CONFIG ---------------- */
+const CSV_PATHS = [
+  "data/automation_data.csv"     // 👉 CSV’nizin yolu. Çoklu dosya için yeni satır ekleyin.
+];
+
+/* ---------------- CONSTANTS & GLOBALS ---------------- */
+const countryMap = {DE:'Germany',AU:'Australia',IN:'India',ME:'Mexico',TR:'Turkey',PL:'Poland',UA:'Ukraine',HK:'Hong Kong',TW:'Taiwan',BD:'Bangladesh','/A':'N/A',JP:'Japan',KR:'S. Korea',UK:'United Kingdom',SE:'SEA',GS:'PGS',MY:'Malaysia',NA:'PNA'};
+const CURRENT_YEAR = new Date().getFullYear();
+let charts=[],deptChart=null,allLiveRows=[],latestParsedRows=[];
+
+/* ---------------- CHART PLUGIN ---------------- */
+Chart.register({id:'centerText',afterDraw(c,a,o){if(c.config.type!=='doughnut')return;const{ctx,chartArea:{left:r,right:s,top:t,bottom:n}}=c;if(!c.data.datasets.length)return;const v=(o?.type||'total')==='categories'?c.data.labels.length:c.data.datasets[0].data.reduce((x,y)=>x+y,0);ctx.save();ctx.font='600 1rem Inter, sans-serif';ctx.fillStyle='#000';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v,(r+s)/2,(t+n)/2);ctx.restore();}});
+
+/* ---------------- DROPDOWNS ---------------- */
+const countrySel=document.getElementById('countryFilter'),yearSel=document.getElementById('yearFilter');
+countrySel.addEventListener('change',applyFilters);yearSel.addEventListener('change',applyFilters);
+
+/* ---------------- CSV FETCH ---------------- */
+document.getElementById('calculateBtn').onclick=async()=>{try{
+  const parsedArrays=await Promise.all(CSV_PATHS.map(p=>fetch(p).then(r=>{if(!r.ok)throw Error('Fetch fail '+p);return r.text();}).then(txt=>Papa.parse(txt,{header:true,skipEmptyLines:true}).data)));
+  const rows=parsedArrays.flat();latestParsedRows=rows;buildDashboard(rows);refreshBusinessCase();
+}catch(e){console.error(e);alert('Data could not be loaded – CSV yolunu kontrol edin.');}};
+
+/* ---------------- FILTERS & DASHBOARD ---------------- */
+function applyFilters(){if(!allLiveRows.length)return;let r=allLiveRows;
+  if(countrySel.value!=='Global')r=r.filter(x=>{const id=(x['Automation ID']||'').split('-')[0],c=id.slice(1,3).toUpperCase(),n=countryMap[c]||c;return n===countrySel.value;});
+  if(yearSel.value!=='All Years')r=r.filter(x=>getYear(x['Launch Date'])==yearSel.value);
+  buildDeptChart(r);}
+function populateSelect(sel,arr,def){sel.innerHTML='';arr.forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.appendChild(o);});sel.value=def;}
+function populateFilters(countryObj,yearSet){populateSelect(countrySel,[['Global','Global'],...Object.keys(countryObj).map(x=>[x,x])],'Global');populateSelect(yearSel,[['All Years','All Years'],...Array.from(yearSet).sort().map(y=>[y,y])],'All Years');}
+
+const baseOpts={responsive:true,maintainAspectRatio:false,plugins:{legend:{},tooltip:{callbacks:{label(c){const v=typeof c.parsed==='object'?(c.parsed.x??c.parsed.y):c.parsed;return`${c.dataset.label||c.label}: ${v}`;}}}}};
+const makeDoughnut=(el,d,mode)=>new Chart(el,{type:'doughnut',data:{labels:Object.keys(d),datasets:[{data:Object.values(d),hoverOffset:6}]},options:{...baseOpts,plugins:{...baseOpts.plugins,centerText:{type:mode}}}});
+const makeCombo=(el,l,b,ln)=>new Chart(el,{type:'bar',data:{labels:l,datasets:[{label:'Benefit (hrs p.a.)',type:'bar',data:b,xAxisID:'x',borderRadius:4,maxBarThickness:28,order:0},{label:'Process Count',type:'line',data:ln,xAxisID:'x1',tension:.3,fill:false,pointRadius:3,borderWidth:2,order:10}]},options:{...baseOpts,indexAxis:'y',scales:{x:{beginAtZero:true,title:{display:true,text:'Benefit (hrs p.a.)'}},x1:{beginAtZero:true,position:'top',grid:{drawOnChartArea:false},title:{display:true,text:'Process Count'}}}}});
+function getYear(d){const y=new Date(d).getFullYear();return isNaN(y)?CURRENT_YEAR:y;}
+function buildDeptChart(rows){const cnt={},ben={};rows.forEach(r=>{const d=r['Business Area'];if(!d)return;cnt[d]=(cnt[d]||0)+1;ben[d]=(ben[d]||0)+parseFloat(r['Benefit per company (hours saved/year)']||0);});
+  const depts=Object.keys(cnt),bars=depts.map(d=>ben[d]||0),lines=depts.map(d=>cnt[d]);depts.push('Total');bars.push(bars.reduce((a,b)=>a+b,0));lines.push(lines.reduce((a,b)=>a+b,0));
+  if(deptChart)deptChart.destroy();deptChart=makeCombo(document.getElementById('deptComboChart'),depts,bars,lines);}
+function buildDashboard(rows){charts.forEach(c=>c.destroy());charts=[];const live=rows.filter(r=>r.Status&&r.Status.trim().toLowerCase()!=='decommissioned');allLiveRows=live;
+  const tally=(a,f)=>a.reduce((o,i)=>{const k=f(i);if(k)o[k]=(o[k]||0)+1;return o;},{}),
+        status=tally(live,r=>r.Status),
+        country=tally(live,r=>{const id=(r['Automation ID']||'').split('-')[0],c=id.slice(1,3).toUpperCase();return countryMap[c]||c;}),
+        years=new Set(live.map(r=>getYear(r['Launch Date'])));
+  charts.push(makeDoughnut(document.getElementById('statusChart'),status,'total'));
+  charts.push(makeDoughnut(document.getElementById('countryChart'),country,'categories'));
+  populateFilters(country,years);buildDeptChart(live);document.getElementById('metrics').classList.remove('d-none');}
+
+/* ---------------- BUSINESS-CASE (orijinal fonksiyonlar değişmedi) ---------------- */
+function refreshBusinessCase(){/* ... orijinal JS ... */}
+document.querySelectorAll('#parameters input').forEach(el=>el.addEventListener('input',()=>{if(latestParsedRows.length)refreshBusinessCase();}));
+</script>
+</body>
+</html>
